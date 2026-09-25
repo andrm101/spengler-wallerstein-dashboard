@@ -7,7 +7,7 @@ Branch start commit: b1770accc9859a3f6b98cce147e0b2ac78fd3539
 - [x] Task 1: Project scaffold and utilities (commits b1770ac..0cf69ca, review clean)
 - [x] Task 2: Country code harmonization (commits 0cf69ca..5824bff, review clean)
 - [x] Task 3: Bronze — Maddison 2023 + JST R6 (commits 49b0057..0678acf, review clean)
-- [ ] Task 4: Bronze — NMC v7 (CINC + Urbanization)
+- [x] Task 4: Bronze — NMC v7 (CINC + Urbanization) (cinc_silver.parquet, urban_silver.parquet present; scripts/bronze/ingest_nmc.py, tests/bronze/test_bronze_nmc.py)
 - [ ] Task 5: Bronze — V-Dem v16 + Polity5
 - [ ] Task 6: Bronze — COW Trade National
 - [ ] Task 7: Silver — Phi dimensions
