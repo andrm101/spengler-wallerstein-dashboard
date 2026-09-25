@@ -1,0 +1,169 @@
+# Synthesis Specification: Spengler-Wallerstein-Cybernetic Framework for Systems Critique
+**Date**: 2026-06-23  
+**Status**: Design Approved — Ready for Evidence Gathering  
+**Author**: Andrei Manoloiu (with Claude advisory layer)  
+**Objective**: Operationalize a novel theoretical synthesis for rigorous macro-world systems critique via cybernetic feedback loops, grounded in borrowed validated data and identified discovery gaps.
+
+---
+
+## I. Project Charter
+
+### Goal
+Build a **functioning interactive dashboard** and **peer-reviewed academic foundation** that:
+1. Operationalizes Spengler's civilizational morphology + Wallerstein's world-systems + cybernetic systems theory as unified analytical framework
+2. Identifies and operationalizes critical feedback loops (financialization→decay, semi-peripheral buffering, hegemonic cycles, etc.)
+3. Uses **borrowed, validated datasets** from established academic sources (Maddison, V-Dem, COW, World Bank, OECD, etc.)
+4. Maps **gaps between theory and data** as discovery vectors → novel insights in macro-cybernetic understanding
+5. Delivers both academic paper (peer-reviewed) and public-facing critique toolkit (policy/advocacy use)
+
+### Success Criteria
+- **Theoretical rigor**: All feedback loops scientifically justified; gaps explicitly flagged with discovery potential
+- **Data integrity**: Sources audited; measurement error quantified; uncertainty propagated through model
+- **Novelty**: Synthesis itself is novel; gaps identified point to new research directions in cybernetic systems analysis
+- **Usability**: Dashboard enables critique of societal dynamics (identification of common denominators across confounders)
+
+### Timeline & Resources
+- **Duration**: 12+ months
+- **Team**: Solo (Andrei) as orchestrator; AI agent fleet for parallel reconnaissance, validation, implementation
+- **Sequencing**: Rigor first (evidence gathering), delivery second (dashboard implementation follows validation)
+
+---
+
+## II. Reconnaissance & Validation Phase (Phase 0)
+
+**Purpose**: Establish credible foundation before any implementation. Three parallel tracks converge into synthesis spec.
+
+### Track 1: Theoretical Validation + Gap Mapping
+
+**Scope**: Literature audit on Spengler, Wallerstein, cybernetics operationalization.
+
+**Questions to Answer**:
+1. What operationalizations of Spengler's morphology exist in peer-reviewed literature? What succeeded/failed?
+2. What empirical applications of Wallerstein exist? Which network metrics are validated?
+3. What cybernetic frameworks for historical/societal systems exist? What's the state of bifurcation detection in practice?
+4. **Where are the conceptual gaps?** What remains unsolved that could be novel?
+
+**Deliverables**:
+- Literature map: Spengler operationalizations (10+ papers reviewed)
+- Literature map: Wallerstein empirical applications (10+ papers)
+- Literature map: Cybernetic systems theory applications to history/macro-dynamics (10+ papers)
+- **Gap analysis**: Unsolved conceptual problems → candidate novel directions
+- Confidence assessment: Which frameworks are textbook vs. contested vs. novel
+
+**Success Threshold**: Can articulate what's novel about the synthesis and why existing work doesn't already solve the problem.
+
+---
+
+### Track 2: Data Source Audit + Measurement Gaps
+
+**Scope**: For each of 20 dimensions (10 Spengler + 10 Wallerstein), identify data sources and coverage.
+
+**Questions to Answer**:
+1. For each dimension, what datasets already exist? (Maddison GDP? V-Dem institutions? COW trade? etc.)
+2. Coverage by epoch (1–1500 CE, 1500–1800, 1800–1950, 1950–2020)?
+3. Coverage by region (Western Europe, Eastern Europe, Mediterranean, etc.)?
+4. Measurement error per source per epoch?
+5. **Where are gaps?** Which dimensions have no ready-made datasets? Can we create new indicators?
+
+**Deliverables**:
+- Data feasibility matrix: Dimension × Epoch × Region, with quality scores (High/Medium/Low)
+- Indicator operationalization audit: Which come from established sources? Which need custom design?
+- **Novel measurement opportunities**: Where could we create new indicators? (e.g., "entropy as composite index")
+- Data quality flags by epoch (pre-1500: low confidence; 1800–2020: high confidence)
+
+**Success Threshold**: Know exactly which 80% of indicators can be borrowed ready-made vs. which 20% require novel operationalization. Identify measurement gaps as discovery opportunities.
+
+---
+
+### Track 3: Feedback Loop Validation + Anomaly Identification
+
+**Scope**: For each proposed feedback loop (financialization→decay, semi-peripheral buffering, etc.), assess scientific grounding.
+
+**Questions to Answer**:
+1. Does peer-reviewed literature support each loop? (Granger causality? Econometric evidence? Theory?)
+2. What's the confidence level: Established, Plausible, Exploratory?
+3. **Where does reality deviate from theory?** Historical cases where loops broke or unexpected outcomes occurred?
+4. What do anomalies reveal about cybernetic dynamics?
+
+**Deliverables**:
+- Feedback loop inventory: Each loop → evidence type (empirical/theoretical) + confidence tier
+- Loop strength estimates: Where available from literature, quantified correlations
+- **Anomaly catalog**: Cases where expected loop dynamics didn't occur → implications for theory
+- Cybernetic insights: What do deviations teach us about system behavior?
+
+**Success Threshold**: Can justify each feedback loop from literature AND articulate what remains uncertain/anomalous. Gaps point to novel research directions.
+
+---
+
+## III. Novel Territory Map (To Be Filled by Scouts)
+
+### Conceptual Gaps
+[From Track 1: Unsolved problems in existing literature]
+
+### Measurement Gaps
+[From Track 2: Dimensions lacking data; candidate new indicators]
+
+### Anomaly Catalog
+[From Track 3: Historical cases where theory diverged from expectation]
+
+### Discovery Vectors
+[Why each gap matters for macro-cybernetic understanding]
+
+---
+
+## IV. Dashboard Architecture (High-Level)
+
+### Core Views (from validated dimensions)
+1. **Temporal System Dynamics**: Entropy, phase classification, early warning signals
+2. **Network/Spatial**: Trade networks, zone classification, centrality evolution
+3. **Feedback Loop Explorer**: Active loops (positive/negative), strength over time, historical examples
+
+### Discovery/Critique Layer (from gap analysis)
+4. **Counterfactual Sandbox**: Modify feedback loop strengths, test sensitivity
+5. **Anomaly Viewer**: Historical deviations from theory + cybernetic interpretation
+6. **Narrative-Critique Panel**: Expert commentary, uncertainty flags, alternative theories
+
+### Meta-Learning Layer
+7. **Model Update Tracker**: What changed and why
+8. **Feedback Loop Salience**: Which loops predict best? How weights evolved?
+
+---
+
+## V. Success Gates
+
+### Pre-Implementation Gate
+- [ ] Theoretical validation complete: Novel aspects identified, gaps cataloged
+- [ ] Data audit complete: 80% baseline data sourced, 20% novel measurements designed
+- [ ] Feedback loops validated: Confidence tiers assigned, anomalies documented
+- [ ] Synthesis spec peer-reviewed (optional: by 1–2 external academics)
+
+### Post-MVP Gate
+- [ ] Dashboard runs on 1850–1950 European data without errors
+- [ ] Entropy formula operationalized, early warning signals functional
+- [ ] Feedback loops implemented as Granger-causal VAR
+- [ ] Backtesting on known transitions (Roman collapse, etc.) shows plausible predictions
+
+### Pre-Publication Gate
+- [ ] Full 1800–2000 CE model runs with uncertainty quantification
+- [ ] Sensitivity analysis complete: elasticity of results to parameter choices
+- [ ] Anomalies analyzed: gap explanations defensible
+- [ ] Academic paper draft passes peer review
+
+---
+
+## VI. Constraints & Unknowns
+
+**Hard Constraints**:
+- Solo development (orchestration via agent fleet, not parallel coding)
+- Must use borrowed datasets where available (don't reinvent data collection)
+- Feedback loops must be scientifically defensible (no ad-hoc specifications)
+
+**Unknowns to be resolved by reconnaissance**:
+- How many of the 20 dimensions can actually be measured from historical data?
+- Which feedback loops have empirical support vs. remain theoretical?
+- What novel indicators emerge from gap analysis?
+- How do we handle pre-1500 data (very sparse)?
+
+---
+
+**Next Step**: Dispatch reconnaissance scouts (Tracks 1–3) in parallel. Synthesize findings into complete spec before implementation begins.
