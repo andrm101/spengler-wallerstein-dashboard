@@ -1,0 +1,4 @@
+event,country_cow,event_year,di_peak_year,di_peak_value,pre_collapse_mean,stable_mean,cohen_d,passes
+1914 WWI,UKG,1914,1911,44.41,40.22,38.72,0.274,False
+1929 Depression,USA,1929,1929,45.87,33.35,18.47,1.761,True
+1929 Depression,UKG,1929,1926,47.62,43.01,37.03,1.69,True
