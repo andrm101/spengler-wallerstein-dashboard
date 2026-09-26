@@ -13,9 +13,9 @@ def rescale_di(raw: np.ndarray) -> np.ndarray:
     return (raw - lo) / (hi - lo) * 100
 
 def build_panel(alpha: float, beta: float) -> pd.DataFrame:
-    phi_df   = pd.read_parquet(DATA_SILVER / "phi_silver.parquet")[["phi"]]
-    psi_df   = pd.read_parquet(DATA_SILVER / "psi_silver.parquet")[["psi"]]
-    omega_df = pd.read_parquet(DATA_SILVER / "omega_silver.parquet")[["omega"]]
+    phi_df   = pd.read_parquet(DATA_SILVER / "phi_silver.parquet")[["phi", "phi_ci_wide"]]
+    psi_df   = pd.read_parquet(DATA_SILVER / "psi_silver.parquet")[["psi", "psi_ci_wide"]]
+    omega_df = pd.read_parquet(DATA_SILVER / "omega_silver.parquet")[["omega", "omega_ci_wide"]]
 
     panel = phi_df.join(psi_df, how="outer").join(omega_df, how="outer")
 
@@ -29,6 +29,16 @@ def build_panel(alpha: float, beta: float) -> pd.DataFrame:
     panel["di"] = rescale_di(panel["di_raw"].values)
     panel["alpha"] = alpha
     panel["beta"]  = beta
+
+    # Cross-layer confidence flag: a row is low-confidence if ANY of its
+    # three layer components was itself flagged wide-CI/low-confidence.
+    # Previously computed upstream (Silver) but never read here, so it had
+    # zero downstream effect (I-2 fix).
+    panel["di_ci_wide"] = (
+        panel["phi_ci_wide"].fillna(False)
+        | panel["psi_ci_wide"].fillna(False)
+        | panel["omega_ci_wide"].fillna(False)
+    )
     return panel
 
 def run(alpha: float = 0.5, beta: float = 0.3) -> None:

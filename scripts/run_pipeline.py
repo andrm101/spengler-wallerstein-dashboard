@@ -9,7 +9,7 @@
 # as bare file paths, since none of scripts/bronze, scripts/silver, etc.
 # are installed on sys.path outside of pytest's conftest.py -- running them
 # as file paths raises ModuleNotFoundError: No module named 'scripts.utils'.
-import subprocess, sys
+import os, subprocess, sys
 
 STEPS = [
     "scripts/bronze/ingest_maddison.py",
@@ -30,4 +30,7 @@ if __name__ == "__main__":
     for step in STEPS:
         module = step.replace("/", ".").replace(".py", "")
         print(f"\n--- {step} ---")
-        result = subprocess.run([sys.executable, "-m", module], check=True)
+        result = subprocess.run(
+            [sys.executable, "-m", module], check=True,
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+        )
