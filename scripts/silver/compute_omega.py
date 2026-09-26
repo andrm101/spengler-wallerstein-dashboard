@@ -53,12 +53,18 @@ def run() -> None:
         full.loc[df_omega[col].notna()] = z / 3.0
         df_omega[col] = full.clip(-1, 1)
 
+    # -- Confidence interval flag: computed from the RAW (pre-fillna) component
+    # columns -- the final omega score's own null-ness is always False once
+    # every component has been neutral-filled below, so it cannot be used here.
+    null_weight_fraction = sum(
+        df_omega[col].isna().astype(float) * weight for col, weight in OMEGA_WEIGHTS.items()
+    )
+    df_omega["omega_ci_wide"] = null_weight_fraction > 0.5
+
     df_omega["omega"] = sum(
         df_omega[col].fillna(0) * weight
         for col, weight in OMEGA_WEIGHTS.items()
     ).clip(-1, 1)
-
-    df_omega["omega_ci_wide"] = df_omega["omega"].isna()
 
     out = DATA_SILVER / "omega_silver.parquet"
     df_omega[list(OMEGA_WEIGHTS.keys()) + ["omega", "omega_ci_wide"]].to_parquet(out)

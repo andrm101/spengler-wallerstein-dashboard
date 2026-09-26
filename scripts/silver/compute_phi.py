@@ -14,6 +14,14 @@ PHI_WEIGHTS: dict[str, float] = {
     "lifecycle_norm":    0.10,
 }
 
+# creativity_proxy is NOT part of PHI_WEIGHTS / the weighted phi formula (it is
+# a Phase-1 placeholder tracked alongside the score, not folded into it). For
+# the purposes of the phi_ci_wide confidence flag it is nonetheless assigned a
+# documented nominal weight here, since a hardcoded neutral placeholder for a
+# scrutinized dimension genuinely degrades confidence in the row even though
+# it does not currently move the phi value itself.
+CREATIVITY_PROXY_CI_WEIGHT = 0.15
+
 def _load_silver() -> pd.DataFrame:
     maddison = pd.read_parquet(DATA_SILVER / "maddison_silver.parquet")
     jst      = pd.read_parquet(DATA_SILVER / "jst_silver.parquet")
@@ -57,17 +65,24 @@ def run() -> None:
     # Placeholder: set to 0.5 with ci_wide=True; replace in Phase 2
     df["creativity_proxy"] = 0.5
 
+    # -- Confidence interval flag: computed from the RAW (pre-fillna) component
+    # columns, since the final phi score's own null-ness is meaningless once
+    # every component has been neutral-filled below.
+    # creativity_proxy is always a Phase-1 placeholder constant (never genuinely
+    # observed), so any row is at minimum as uncertain as creativity_proxy's own
+    # weight -- treat it as a permanent contribution to the null-weight fraction.
+    assert DIMENSION_QUALITY["creativity_proxy"] < CI_WIDE_THRESHOLD
+    null_weight_fraction = sum(
+        df[col].isna().astype(float) * weight for col, weight in PHI_WEIGHTS.items()
+    )
+    creativity_weight = CREATIVITY_PROXY_CI_WEIGHT
+    df["phi_ci_wide"] = (null_weight_fraction + creativity_weight) > 0.5
+
     # -- Weighted Φ
     df["phi"] = sum(
         df[col].fillna(0.5) * weight
         for col, weight in PHI_WEIGHTS.items()
     )
-
-    # -- Confidence interval flag: creativity_proxy quality = 3 < CI_WIDE_THRESHOLD (5)
-    # Phase 1 always folds creativity_proxy (quality below threshold) into every Φ score,
-    # so phi_ci_wide is True for all rows.
-    assert DIMENSION_QUALITY["creativity_proxy"] < CI_WIDE_THRESHOLD
-    df["phi_ci_wide"] = True
 
     out = DATA_SILVER / "phi_silver.parquet"
     df[["fin_norm", "urban_norm", "polity_norm", "phase_proxy",

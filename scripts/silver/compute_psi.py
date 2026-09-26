@@ -68,11 +68,18 @@ def run() -> None:
     trade_volume = df["total_exports"].fillna(0) + df["total_imports"].fillna(0)
     df["cohesion_norm"] = normalize_series(1 - normalize_series(trade_volume))
 
+    # -- Confidence interval flag: computed from the RAW (pre-fillna) component
+    # columns -- the final psi score's own null-ness is always False once every
+    # component has been neutral-filled below, so it cannot be used here.
+    null_weight_fraction = sum(
+        df[col].isna().astype(float) * weight for col, weight in PSI_WEIGHTS.items()
+    )
+    df["psi_ci_wide"] = null_weight_fraction > 0.5
+
     df["psi"] = sum(
         df[col].fillna(0.5) * weight
         for col, weight in PSI_WEIGHTS.items()
     )
-    df["psi_ci_wide"] = df["psi"].isna()
 
     out = DATA_SILVER / "psi_silver.parquet"
     df[["hegemon_norm", "tot_norm", "network_norm", "zone_norm",

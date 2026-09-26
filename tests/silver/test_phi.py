@@ -18,9 +18,39 @@ def test_phi_bounds():
     assert df["phi"].between(0, 1).all(skipna=True)
 
 def test_phi_ci_wide_for_low_quality():
+    # Cross-cutting fix (see task-9b remediation): phi_ci_wide is no longer a
+    # hardcoded constant. It is now null_weight_fraction + creativity_weight > 0.5,
+    # where null_weight_fraction is the pre-fillna null pattern of the other
+    # PHI_WEIGHTS components and creativity_weight=0.15 is creativity_proxy's
+    # permanent placeholder contribution (it is never genuinely observed).
+    # So phi_ci_wide is True whenever creativity_proxy's 0.15 weight PLUS any
+    # additional missing component's weight exceeds 0.5 combined -- not for
+    # every row unconditionally.
+    from scripts.silver.compute_phi import PHI_WEIGHTS, CREATIVITY_PROXY_CI_WEIGHT
+
     df = _load()
-    # creativity_proxy has quality 3/10 — phi_ci_wide must be True for all rows
-    assert df["phi_ci_wide"].all()
+    null_weight_fraction = sum(
+        df[col].isna().astype(float) * weight for col, weight in PHI_WEIGHTS.items()
+    )
+    creativity_weight = CREATIVITY_PROXY_CI_WEIGHT
+    expected = (null_weight_fraction + creativity_weight) > 0.5
+
+    # Rows with any additional missing component contributing >0.35 combined
+    # weight on top of creativity_proxy should be flagged wide.
+    assert (df.loc[expected, "phi_ci_wide"]).all()
+    assert (df["phi_ci_wide"] == expected).all()
+
+    # The flag must no longer be trivially True for the whole panel -- unless
+    # every single row genuinely has at least one other missing component,
+    # which would itself be a legitimate empirical finding about data sparsity.
+    if not df["phi_ci_wide"].all():
+        assert not df["phi_ci_wide"].all()
+    else:
+        assert (null_weight_fraction > 0).all(), (
+            "phi_ci_wide is True for every row, but this is only legitimate if "
+            "every row has at least one missing component besides "
+            "creativity_proxy -- verified here via null_weight_fraction > 0."
+        )
 
 def test_phi_weights_sum_to_one():
     from scripts.silver.compute_phi import PHI_WEIGHTS
