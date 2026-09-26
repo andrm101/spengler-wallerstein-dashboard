@@ -1441,7 +1441,23 @@ git commit -m "feat: gold DI formula + grid-search calibration against 1848/1914
 
 ---
 
-## Task 11: Validation — Backtesting 1848 / 1914 / 1929
+## Task 11: Validation — Backtesting 1914 / 1929
+
+**SCOPE CORRECTION (post-Task-10 ruling, see progress ledger):** originally titled
+"1848 / 1914 / 1929". Task 10's calibration run found that all four 1848-revolution
+targets (FRN/AUH/GMY) are structurally unreachable: every bronze ingestion script
+(Tasks 3-6) hard-floors `YEAR_MIN=1870`, so 1838-1847 data does not exist anywhere
+in this pipeline, and "AUH" (Austria-Hungary) was never in `MVP_COUNTRIES` to begin
+with. Re-ingesting further back is out of scope for Phase 1 (explicit user decision).
+`EVENTS` below is trimmed to the 3 targets that can actually produce a row (UKG-1914,
+USA-1929, UKG-1929), and the pass-rate expectation in Step 3 is corrected from the
+original, mathematically-unreachable "≥4/7" to a threshold that fits the real 3-target
+ceiling. The α/β used by `di_panel.parquet` should also be treated as an **honest
+Phase 1 placeholder, not a validated calibration** — Task 10's grid search returned
+an identical loss (3.6667) for all 55 (α, β) combinations tested, meaning the "best"
+pair was an arbitrary tie-break, not a real optimum. This caveat must be carried into
+any report/dashboard text that references α/β or "calibrated against historical
+transitions."
 
 **Files:**
 - Create: `scripts/validation/backtesting.py`
@@ -1479,14 +1495,12 @@ import numpy as np
 import pandas as pd
 from scripts.utils.paths import DATA_GOLD
 
-# Backtesting specification (from design spec Section 7.2):
+# Backtesting specification (from design spec Section 7.2), trimmed to the 3
+# targets actually reachable given the pipeline's YEAR_MIN=1870 floor and
+# MVP_COUNTRIES excluding "AUH" -- see the Task 11 scope-correction note above.
 # Event → (country_cow, event_year, pre_collapse_window_start, stable_comparison_start)
 EVENTS = [
-    ("1848 Revolutions", "FRN", 1848, 1838, 1820),
-    ("1848 Revolutions", "AUH", 1848, 1838, 1820),
-    ("1848 Revolutions", "GMY", 1848, 1838, 1820),
     ("1914 WWI",         "UKG", 1914, 1904, 1870),
-    ("1914 WWI",         "AUH", 1914, 1904, 1870),
     ("1929 Depression",  "USA", 1929, 1919, 1880),
     ("1929 Depression",  "UKG", 1929, 1919, 1880),
 ]
@@ -1553,9 +1567,16 @@ if __name__ == "__main__":
 python scripts/validation/backtesting.py
 pytest tests/validation/test_backtesting.py -v
 ```
-Expected: 3 PASSED; at least 4/7 targets pass (≥50%).
+Expected: 3 PASSED; at least 2/3 targets pass (≥50%, matching `test_at_least_half_targets_pass`'s
+`pass_rate >= 0.5` against the real 3-target ceiling — the original "≥4/7" expectation
+is unreachable, see the Task 11 scope-correction note above).
 
-If fewer than 4 targets pass: open `data/gold/calibration_results.csv`, try the next-best α/β pair, re-run `python scripts/gold/compute_di.py` with those values, then re-run backtesting.
+If fewer than 2 targets pass: note that `calibration_results.csv`'s "next-best" α/β
+pairs are not meaningfully different from the current choice (Task 10 found the loss
+is identical — 3.6667 — across the entire grid), so trying another pair is unlikely to
+change the outcome. Report the honest result instead of grid-searching for a
+pass — this is a genuine Phase 1 finding (3 correlated/non-independent historical
+windows provide weak validation evidence), not a bug to route around.
 
 - [ ] **Step 4: Commit**
 
