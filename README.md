@@ -1,8 +1,28 @@
-# Spengler-Wallerstein-Dashboard: Systems Critique Engine
+# Spengler-Wallerstein-Dashboard: Downfall Index
 
-**Project Goal**: Build a rigorous, interactive dashboard operationalizing Spengler's morphology of cultures, Wallerstein's world-systems theory, and cybernetic systems principles to identify feedback loops driving societal dysfunction. Deliver both peer-reviewed academic foundation and public-facing systems critique toolkit.
+![Status](https://img.shields.io/badge/status-phase%201%20complete-brightgreen) ![Python](https://img.shields.io/badge/python-3.14-blue) ![Calibration](https://img.shields.io/badge/calibration-honest%20placeholder-yellow) ![Backtest](https://img.shields.io/badge/backtest-1%2F3%20pass-orange)
 
-**Timeline**: 12+ months | **Team**: Solo (Andrei) orchestrator + AI agent fleet | **Status**: Phase 1 COMPLETE — 12/12 tasks done (Bronze ingestion, Silver dimension layers, Gold DI formula + Phase 1 placeholder calibration, backtesting validation, and the dashboard with 5 figures). Calibration is an honest, documented placeholder (not a validated calibration — see `docs/LIMITATIONS.md`); backtesting covers 3 targets (1914/1929, not 1848/1873). See `.superpowers/sdd/2026-06-25-downfall-index-phase1/progress.md` for the live task ledger.
+> A composite "Downfall Index" (DI) operationalizing Spengler's morphology of cultures, Wallerstein's world-systems theory, and cybernetic feedback principles into a single, historically-backtested measure of structural vulnerability.
+
+`DI = Φ × (1 + α·Ψ) × (1 + β·Ω)`, rescaled to [0, 100], where **Φ** (Spengler) measures civilizational phase position, **Ψ** (Wallerstein) measures world-systems structural pressure, and **Ω** (cybernetics) measures 10-year momentum in both.
+
+---
+
+## Key findings — reported honestly, not oversold
+
+- **Calibration is an unvalidated Phase 1 placeholder, not a fitted result**: a full 55-point grid search over (α, β) returned an *identical* loss at every combination — the "best" pair (α=0.1, β=0.1) is an arbitrary tie-break, not a genuine optimum. This is stated directly on every dashboard figure, not buried in a footnote.
+- **Backtest: 1 of 3 historical transitions pass** — UKG's 1929 Depression shows a real pre-collapse divergence (Cohen's d = **1.69**); UKG's 1914 WWI transition does not (d = 0.27, below the d ≥ 0.5 threshold)
+- 1848 European revolutions were **structurally excluded**, not glossed over: every bronze ingestion script floors at year 1870, so pre-1870 targets can never be tested against this data — documented in `docs/LIMITATIONS.md` rather than silently dropped from the target list
+- Cohen's d uses proper sample-variance pooling (ddof=1) with bootstrap 95% confidence intervals, and the "peak must lead the transition" window is strict (`< event_year`, not `≤`) — an earlier version's peak-inclusive-of-event-year criterion was corrected during final review
+- Missing-data artefacts (JST's 36.7%-null `fin_norm`, neutral-filled) visibly drive some of the sharpest early-period swings in the timeline figure — flagged directly on the chart, not left for a reader to discover independently
+
+## Three layers
+
+| Layer | Framework | Formula weight | What it measures |
+|---|---|---|---|
+| **Φ** (Phi) | Spengler | 25% fin, 20% urban, 20% polity, 15% phase, 10% mass society, 10% lifecycle | Civilizational phase position |
+| **Ψ** (Psi) | Wallerstein | 25% hegemony, 20% terms-of-trade, 20% network centrality, 15% zone, 10% surplus, 10% cohesion | World-systems structural pressure |
+| **Ω** (Omega) | Cybernetics | 25% d(fin), 25% d(hegemony), 20% d(network), 15% d(creativity), 15% d(terms-of-trade) | 10-year momentum, ∈ [−1, +1] |
 
 ---
 
@@ -10,164 +30,52 @@
 
 ```mermaid
 flowchart TD
-    Maddison["Maddison — World GDP 1-2020 CE"] --> Raw["data/raw (immutable)"]
-    Hyde["HYDE — population density"] --> Raw
-    VDem["V-Dem — institutional indicators"] --> Raw
-    COW["Correlates of War — trade/MID/alliances"] --> Raw
-    Raw --> Ingest["scripts/ ingest_*.py"]
-    Ingest --> Dimensions["compute_dimensions.py"]
-    Dimensions --> Processed["data/processed<br/>dimensions-1850-1950.csv,<br/>feedback-loops.csv"]
-    Evidence["evidence/ — Scout reports<br/>(theoretical, data audit, feedback loops)"] --> Synthesis["SYNTHESIS-SPEC-UPDATE.md"]
-    Processed --> Synthesis
-    Synthesis --> Dashboard["Interactive dashboard"]
+    Maddison["Maddison 2023<br/>GDP per capita"] --> Bronze["data/processed/*_silver.parquet"]
+    JST["JST Macrohistory R6<br/>financialization"] --> Bronze
+    NMC["COW NMC v7<br/>CINC + urbanization"] --> Bronze
+    VDem["V-Dem v16<br/>institutions"] --> Bronze
+    Polity["Polity5<br/>regime type"] --> Bronze
+    COWTrade["COW Trade v4.0<br/>exports/imports"] --> Bronze
+    Bronze --> Phi["scripts/silver/compute_phi.py<br/>phi_silver.parquet"]
+    Bronze --> Psi["scripts/silver/compute_psi.py<br/>psi_silver.parquet"]
+    Phi --> Omega["scripts/silver/compute_omega.py<br/>omega_silver.parquet"]
+    Psi --> Omega
+    Phi --> Gold["scripts/gold/compute_di.py<br/>+ calibrate.py"]
+    Psi --> Gold
+    Omega --> Gold
+    Gold --> Backtest["scripts/validation/backtesting.py<br/>1914/1929, Cohen's d"]
+    Backtest --> Dashboard["scripts/dashboard/<br/>timeline + decomposition figures"]
 ```
 
-## Project Structure
+## Medallion architecture
 
-```
-Spengler-Wallerstein-Dashboard/
-├── evidence/                           # Scout research reports & findings
-│   ├── track-1-theoretical-validation.md     # Spengler/Wallerstein/cybernetics literature audit
-│   ├── track-2-data-audit.md               # Data source inventory & quality assessment
-│   ├── track-3-feedback-loops.md           # Feedback loop evidence & anomalies
-│   ├── consolidated-inventory.md           # Cross-track synthesis
-│   └── SYNTHESIS-SPEC-UPDATE.md            # Final evidence-based findings
-│
-├── data/
-│   ├── raw/                          # Original datasets (immutable)
-│   │   ├── maddison/                # World GDP, 1–2020 CE
-│   │   ├── hyde/                    # Population density grids
-│   │   ├── vdem/                    # V-Dem institutional indicators
-│   │   ├── cow/                     # Correlates of War (trade, MID, alliances)
-│   │   └── ...
-│   └── processed/                   # Cleaned, merged, feature-engineered
-│       ├── dimensions-1850-1950.csv # 20 dimensions × 4 epochs
-│       ├── feedback-loops.csv       # Loop variables + indicators
-│       └── ...
-│
-├── docs/
-│   └── superpowers/
-│       ├── specs/
-│       │   └── 2026-06-23-spengler-wallerstein-cybernetic-synthesis.md
-│       └── plans/
-│           └── 2026-06-23-phase-0-reconnaissance.md
-│
-├── notebooks/                        # Exploratory analysis
-│   ├── 01-eda-theoretical-landscape.ipynb
-│   ├── 02-data-availability-audit.ipynb
-│   └── ...
-│
-├── scripts/                          # Modular Python processing
-│   ├── ingest_maddison.py
-│   ├── ingest_vdem.py
-│   ├── compute_dimensions.py
-│   └── ...
-│
-├── references/                       # Bibliography & knowledge base
-│   ├── spengler-operationalizations.bib
-│   ├── wallerstein-empirical-studies.bib
-│   └── cybernetics-systems-theory.bib
-│
-└── README.md (this file)
+| Layer | Path | Contents |
+|---|---|---|
+| Bronze | `data/bronze/` | Raw files as downloaded, immutable |
+| Silver | `data/processed/*_silver.parquet` | Per-source harmonized panels + Φ/Ψ/Ω composites |
+| Gold | `data/gold/di_panel.parquet` | Final DI score, confidence flags, backtest report |
+
+---
+
+## Status
+
+| Task | Result |
+|---|---|
+| 1–6 — Bronze ingestion | PASS — Maddison, JST, NMC, V-Dem, Polity5, COW Trade |
+| 7–9 — Silver layers (Φ, Ψ, Ω) | PASS — a cross-cutting confidence-flag bug (`*_ci_wide` was broken in 3 different ways across all three layers) found and fixed before Gold construction |
+| 10 — Gold DI formula + calibration | PASS with honest caveat — flat grid-search loss; α/β reported as placeholder |
+| 11 — Backtesting | PASS (rescoped to 1914/1929 after the 1870 data-floor finding) — 1/3 targets pass |
+| 12 — Dashboard | PASS — timeline + 4 decomposition figures, 300 DPI, full source attribution |
+
+Full task-by-task detail, every finding, and every ruling in `docs/superpowers/plans/2026-06-25-downfall-index-phase1.md` and its progress ledger.
+
+---
+
+## Running it
+
+```bash
+conda env create -f environment.yml
+python scripts/run_pipeline.py   # full bronze -> silver -> gold -> backtest -> dashboard
 ```
 
----
-
-## Research Access & Resources
-
-### SDU Library (Institutional Access)
-
-As an MSc Data Science student at SDU Kolding, you have full access to:
-
-- **JSTOR** (4 million+ peer-reviewed articles)
-- **Springer Link** (2 million+ journals & books)
-- **Taylor & Francis Online** (500+ journals)
-- **SAGE Journals** (650+ titles)
-- **ProQuest Dissertations & Theses** (historical academic work)
-- **APA PsycINFO** (behavioral & social science literature)
-- **EconLit** (economics & economic history)
-- **Historical Abstracts & America: History & Life** (primary source indexing)
-
-**Scout briefs will reference these resources.** Ensure scouts leverage institutional access when searching for:
-- Spengler operationalizations (rare/specialized papers)
-- Wallerstein empirical applications (econometric studies)
-- Cybernetics in historical systems (advanced technical literature)
-
-Access via: SDU login → library portal → database search
-
-### Public/Open Access Repositories
-
-- **Google Scholar** (free, includes institutional access when logged in)
-- **arXiv** (preprints in economics, systems theory)
-- **SSRN** (working papers in social science)
-- **Semantic Scholar** (AI-powered paper discovery)
-- **ResearchGate** (researcher networks; often free full-text)
-
----
-
-## Phase 0: Reconnaissance & Validation (Active)
-
-**Status**: Scout briefs finalized. Three parallel agents dispatch immediately.
-
-**Expected completion**: 14 days (scouts run 5–7 days in background; synthesis + validation 2–3 days)
-
-### Parallel Scout Work
-
-- **Scout 1 (Theory)**: Spengler/Wallerstein/cybernetics operationalization literature audit
-  - Output: `evidence/track-1-theoretical-validation.md`
-  - Focus: Peer-reviewed operationalization attempts, success/failure, gaps
-  
-- **Scout 2 (Data)**: Data source audit for 20 dimensions
-  - Output: `evidence/track-2-data-audit.md`
-  - Focus: Coverage by epoch/region, quality scores, novel measurement opportunities
-
-- **Scout 3 (Loops)**: Feedback loop validation & anomaly analysis
-  - Output: `evidence/track-3-feedback-loops.md`
-  - Focus: Empirical evidence, confidence tiers, historical anomalies, cybernetic insights
-
-### Convergence (Day 10–14)
-
-- Consolidate findings: `evidence/consolidated-inventory.md`
-- Synthesize to spec update: `evidence/SYNTHESIS-SPEC-UPDATE.md`
-- Final readiness assessment: `IMPLEMENTATION-READINESS.md`
-- User approval → Phase 1 kickoff
-
----
-
-## Data Sources (Borrowed, Validated)
-
-| Dataset | Epochs | Coverage | Quality | Access |
-|---------|--------|----------|---------|--------|
-| **Maddison Project Database 2020** | 1–2020 CE | 169 countries | High (1800+) | Free download |
-| **HYDE 3.2** | 10000 BCE–2017 | Global, 5' resolution | Medium (pre-1500), High (1800+) | Free |
-| **V-Dem v13** | 1789–2023 | 202 countries | High | Free |
-| **COW Trade** | 1870–2014 | Bilateral trade | High | Free |
-| **World Bank GFDD** | 1960–2020 | 200+ countries | High | Free API |
-| **OECD Data** | 1960–present | OECD + partner countries | High | Free |
-| **Eurostat** | 1995–present | EU + EEA | Very High | Free |
-| **Penn World Table** | 1950–2019 | 183 countries | High | Free |
-
-**All data immutable in `data/raw/`; processed versions in `data/processed/`**
-
----
-
-## Key Contacts & Decision Gates
-
-**Project Orchestrator**: Andrei Manoloiu  
-**Decision Points**:
-- Phase 0 → Phase 1: User reviews evidence quality + readiness assessment
-- Phase 1 → Phase 2: Dashboard MVP validated on 1850–1950 data
-- Phase 2+ : Academic paper draft ready for peer review
-
----
-
-## Next Steps (Immediate)
-
-1. ✓ Project structure created
-2. ✓ Spec & plan committed to project
-3. **→ Dispatch three scouts (Subagent-Driven)**
-4. **→ Monitor progress (daily checkpoint)**
-5. **→ Synthesize findings (Day 10)**
-6. **→ User review & Phase 1 approval (Day 14)**
-
-**When ready, confirm: "Launch scouts now"**
+Figures land in `figures/`; the final panel and backtest report in `data/gold/`.
