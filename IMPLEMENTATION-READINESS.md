@@ -42,7 +42,7 @@
 | Feedback loops representable as cross-variable lags in VAR | ✓ | Standard implementation; statsmodels VAR module suitable |
 | V-Dem institutional quality as conditional moderator | ✓ | Regime-switching specification adds complexity but is feasible |
 | Entropy index computable from available data | ✓ | Weighted composite from dimensions already operationalized |
-| Backtesting on 1848 / 1914 / 1929 feasible | ✓ | All three events fall within MVP epoch and geography |
+| Backtesting on 1848 / 1914 / 1929 feasible | ⚠ PARTIAL (see post-hoc note) | As actually built (Phase 1, Task 10/11), 1848 is unreachable — every bronze ingestion script hard-floors YEAR_MIN=1870, and "AUH" is not in MVP_COUNTRIES. Backtesting covers 3 targets: UKG-1914, USA-1929, UKG-1929. |
 | Early warning signals (variance, autocorrelation) computable | ✓ | Rolling-window statistics; standard implementation |
 | Novel dimensions (Soul-form, GNN Creativity, Commodity Chain) | ⚠ DEFERRED | Phase 2; design documents written; not blocking Phase 1 |
 | Pre-1500 quantitative modeling | ✗ EXCLUDED | Data quality VERY LOW; narrative layer only |
@@ -58,7 +58,7 @@
 - [ ] Dimensions operational: 17/20 (all ready-made; novel three deferred)
 - [ ] Feedback loops modeled: Financialization → Inequality/Decay; Urbanization → Atomization; Hegemonic Cycle position (2–3 loops with PLAUSIBLE confidence)
 - [ ] Core dashboard views: Entropy timeline, zone classification map, hegemonic cycle chart, phase classification proxy, feedback loop strength by era
-- [ ] Backtesting: Known transitions validated (1848, 1914, 1929)
+- [ ] Backtesting: Known transitions backtested (1914, 1929 — 1848 unreachable given YEAR_MIN=1870, see post-hoc note above); "validated" would overstate a Phase 1 placeholder calibration and 3 non-independent windows — see `docs/LIMITATIONS.md`
 - [ ] Uncertainty quantification: Confidence intervals on all computed dimensions; quality tier displayed per epoch
 
 **Explicitly excluded from Phase 1:**
@@ -78,7 +78,7 @@
 |------|-----------|----------|-----------|
 | Data download issues (large files) | Low | Low | All datasets <2 GB; subset HYDE to 1850–1950 |
 | VAR model instability (high dimensions) | Low | Medium | Reduce to 10 core dimensions if needed; use L1 regularization (LASSO-VAR) |
-| Backtesting fails to show plausible predictions | Medium | Medium | Adjust loop specifications; treat as model calibration, not model failure |
+| Backtesting fails to show plausible predictions | Medium | Medium | As actually resolved in Phase 1: report the honest pass rate (1/3 targets at the committed calibration, after fixing a Cohen's-d ddof bug and a "peak concurrent with transition" window bug — see `docs/LIMITATIONS.md`) rather than grid-searching α/β for a pass; a partial pass is a genuine finding, not a bug to route around |
 | Pre-1500 data temptation (using low-quality data) | Medium | High | Enforce strict epoch quality gate in code; raise error if pre-1500 quantitative claims attempted |
 | Soul-form proxy inadequacy | Low | Low | Explicitly label as proxy; flag uncertainty; do not overclaim |
 | Hegemonic cycle dating dispute | Low | Low | Present Wallerstein dates + Kwon (2011) alternatives; dashboard shows both scenarios |

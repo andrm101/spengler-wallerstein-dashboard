@@ -2,7 +2,7 @@
 
 **Project Goal**: Build a rigorous, interactive dashboard operationalizing Spengler's morphology of cultures, Wallerstein's world-systems theory, and cybernetic systems principles to identify feedback loops driving societal dysfunction. Deliver both peer-reviewed academic foundation and public-facing systems critique toolkit.
 
-**Timeline**: 12+ months | **Team**: Solo (Andrei) orchestrator + AI agent fleet | **Status**: Phase 1 (Bronze ingestion) in progress — Tasks 1-4 of 12 complete (scaffold, country code harmonization, Maddison/JST/NMC bronze->silver); V-Dem, Polity5, and COW Trade ingestion, the Silver/Gold derivation stages, and the dashboard itself (Task 12) are not yet built. See `.superpowers/sdd/progress.md` for the live task ledger.
+**Timeline**: 12+ months | **Team**: Solo (Andrei) orchestrator + AI agent fleet | **Status**: Phase 1 COMPLETE — 12/12 tasks done (Bronze ingestion, Silver dimension layers, Gold DI formula + Phase 1 placeholder calibration, backtesting validation, and the dashboard with 5 figures). Calibration is an honest, documented placeholder (not a validated calibration — see `docs/LIMITATIONS.md`); backtesting covers 3 targets (1914/1929, not 1848/1873). See `.superpowers/sdd/2026-06-25-downfall-index-phase1/progress.md` for the live task ledger.
 
 ---
 

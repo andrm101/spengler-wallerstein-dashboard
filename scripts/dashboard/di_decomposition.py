@@ -53,10 +53,17 @@ def run(country: str = "USA", year: int = 1925) -> None:
     if data_missing:
         axes[1].set_title(f"DI = NO DATA  (country/year not in panel)")
     else:
-        axes[1].set_title(f"DI = {di_score:.1f}  (α={alpha}, β={beta})")
+        axes[1].set_title(f"DI = {di_score:.1f}  (α={alpha}, β={beta}: Phase-1 placeholder, not calibrated)")
     axes[1].axvline(x=50, color="grey", linestyle="--", linewidth=0.8)
     axes[1].text(50, 0.85, "Midpoint", ha="center", fontsize=8, color="grey")
     axes[1].set_yticks([])
+    if not data_missing:
+        axes[1].annotate(
+            "Note: at these placeholder weights, DI is dominated by Φ\n"
+            "(Ψ/Ω contribute minimally).",
+            xy=(0.5, -0.28), xycoords="axes fraction",
+            ha="center", va="top", fontsize=7, color="#555555",
+        )
 
     fig.suptitle(
         f"Downfall Index Decomposition — {country}, {year}\n"
@@ -64,7 +71,9 @@ def run(country: str = "USA", year: int = 1925) -> None:
         fontsize=11
     )
     fig.text(0.01, 0.01,
-             "Sources: Maddison (2020), V-Dem v13, Polity5, COW Trade v4.0, CINC v6.0",
+             "Sources: Maddison Project Database 2023; JST Macrohistory Database R6; "
+             "COW National Material Capabilities v7; V-Dem v16; Polity5 (2018); "
+             "COW Trade v4.0",
              fontsize=6, color="grey")
 
     out = FIGURES / f"di_decomposition_{country}_{year}.png"

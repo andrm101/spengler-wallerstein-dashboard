@@ -2,7 +2,14 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a reproducible pipeline that ingests 7 historical datasets, computes a 17-dimension state vector per nation-year (1870–1960), and produces calibrated Downfall Index scores validated against two historical transitions (1914, 1929) plus the 1873 Panic as a third target.
+**Goal:** Build a reproducible pipeline that ingests 7 historical datasets, computes a 17-dimension state vector per nation-year (1870–1960), and produces Downfall Index scores backtested against two historical transitions (1914, 1929) across three country/event pairs.
+
+> **POST-HOC CORRECTION (Task 12 final review):** "calibrated" and "validated"
+> above are not accurate — see the Task 10/11 scope-correction notes below.
+> The α/β weights are a documented Phase 1 placeholder (Task 10's grid search
+> found an identical loss across the entire 55-point grid), and the backtest
+> covers 3 targets (UKG-1914, USA-1929, UKG-1929), not a distinct "1873 Panic"
+> target, which never existed anywhere in this pipeline's code or data.
 
 **Architecture:** Source files reside in `data/bronze/` (immutable). Ingestion scripts read from `data/bronze/` and write standardized parquets to `data/processed/` (silver). Dimension scripts read silver parquets and write layer parquets. Gold layer computes DI. One orchestrator per layer.
 
@@ -1241,6 +1248,17 @@ git commit -m "feat: silver Omega — 10-year momentum derivatives for Layer 3"
 
 ## Task 10: Gold — DI Formula, Calibration, and Rescaling
 
+> **SCOPE/HONESTY CORRECTION (Task 12 final review, see Task 11's note below
+> for the parallel correction on backtesting):** the 7-target calibration grid
+> below (including the three 1848-revolution targets) only ever had 3/7
+> targets actually contribute to `calibration_loss` — see the
+> `CALIBRATION_TARGETS` coverage notes in `scripts/gold/calibrate.py`. More
+> importantly, the grid search found an **identical loss (3.6667) across all
+> 55 (α, β) combinations tested**, so whatever pair ends up "best" is an
+> arbitrary tie-break, not a validated calibration. Any report/dashboard text
+> describing this step must say "Phase 1 placeholder, not calibrated," not
+> "calibrated."
+
 **Files:**
 - Create: `scripts/gold/compute_di.py`
 - Create: `scripts/gold/calibrate.py`
@@ -1248,7 +1266,7 @@ git commit -m "feat: silver Omega — 10-year momentum derivatives for Layer 3"
 
 **Interfaces:**
 - Consumes: `phi_silver.parquet`, `psi_silver.parquet`, `omega_silver.parquet`
-- Produces: `data/gold/di_panel.parquet` — MultiIndex `(country_cow, year)`, columns: `[phi, psi, omega, di_raw, di, ci_lower, ci_upper, alpha, beta]`
+- Produces: `data/gold/di_panel.parquet` — MultiIndex `(country_cow, year)`, columns: `[phi, psi, omega, di_raw, di, ci_lower, ci_upper, alpha, beta, di_ci_wide]`
 
 Formula: `di_raw = phi × (1 + α × psi) × (1 + β × omega)` then min-max rescaled to `di ∈ [0, 100]`.
 
@@ -1567,16 +1585,28 @@ if __name__ == "__main__":
 python scripts/validation/backtesting.py
 pytest tests/validation/test_backtesting.py -v
 ```
-Expected: 3 PASSED; at least 2/3 targets pass (≥50%, matching `test_at_least_half_targets_pass`'s
-`pass_rate >= 0.5` against the real 3-target ceiling — the original "≥4/7" expectation
-is unreachable, see the Task 11 scope-correction note above).
+Expected: 3 PASSED. **POST-HOC CORRECTION (final review, I-5):** the original
+expectation here was "at least 2/3 targets pass," matching a
+`test_at_least_half_targets_pass`'s `pass_rate >= 0.5` assertion. After fixing
+a real statistical bug in `cohen_d()` (population variance where the pooled
+formula requires sample variance) and a "peak concurrent with the transition
+year counts as a pass" bug, the honest pass rate at the committed α=β=0.1
+placeholder calibration is **1/3**, not 2/3. The test was renamed to
+`test_pass_rate_is_honestly_reported` and no longer asserts a ≥50% floor —
+see that test's docstring and `docs/LIMITATIONS.md`. The original "≥4/7"
+expectation was already unreachable regardless, see the Task 11
+scope-correction note above.
 
-If fewer than 2 targets pass: note that `calibration_results.csv`'s "next-best" α/β
-pairs are not meaningfully different from the current choice (Task 10 found the loss
-is identical — 3.6667 — across the entire grid), so trying another pair is unlikely to
-change the outcome. Report the honest result instead of grid-searching for a
-pass — this is a genuine Phase 1 finding (3 correlated/non-independent historical
-windows provide weak validation evidence), not a bug to route around.
+Note: while the calibration *loss* is flat across the grid (Task 10 finding), the
+backtest's Cohen's d IS sensitive to α/β choice — e.g., α=β=0.1 (used here) yields
+2/3 passing vs. 3/3 at other grid points (e.g. α=0.5,β=0.3, the brief's original
+default; and α=β=1.0). The 2/3 result reported here was not cherry-picked (it is the
+less favorable of the two natural candidate values), but readers should understand the
+backtest outcome is contingent on an uncalibrated hyperparameter choice, not a robust
+finding. Report the honest result instead of grid-searching for a pass — this is a
+genuine Phase 1 finding (3 correlated/non-independent historical windows provide weak
+validation evidence, and the pass/fail outcome itself is calibration-dependent), not a
+bug to route around.
 
 - [ ] **Step 4: Commit**
 
